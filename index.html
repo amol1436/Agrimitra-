@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriMitra - Login</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #2c3e50, #4ca1af);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #loginBtn { background-color: #28a745; color: white; }
+    #signupBtn { background-color: #007bff; color: white; }
+    #googleBtn { background-color: #db4437; color: white; }
+
+    #message {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌾 AgriMitra - लॉगिन</h1>
+  <div class="card">
+    <input type="email" id="email" placeholder="ईमेल" required />
+    <input type="password" id="password" placeholder="पासवर्ड" required />
+    <button id="loginBtn" onclick="login()">🔐 लॉगिन</button>
+    <button id="signupBtn" onclick="signup()">📝 Sign Up</button>
+    <button id="googleBtn" onclick="googleLogin()">🔎 Google ने लॉगिन</button>
+    <p id="message"></p>
+  </div>
+
+  <!-- Firebase SDKs (compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDY6fRrW3I-3JntOWM9zWGTBDPj5oZqFz0",
+      authDomain: "agrimitra-36850.firebaseapp.com",
+      databaseURL: "https://agrimitra-36850-default-rtdb.firebaseio.com",
+      projectId: "agrimitra-36850",
+      storageBucket: "agrimitra-36850.appspot.com",
+      messagingSenderId: "838172276534",
+      appId: "1:838172276534:web:69054f06dd8c5010c0a597",
+      measurementId: "G-R7KWCGHLVV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById('message').innerText = "✅ लॉगिन यशस्वी!";
+          window.location.href = "preference.html";
+        })
+        .catch(err => {
+          document.getElementById('message').innerText = "❌ " + err.message;
+        });
+    }
+
+    function signup() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById('message').innerText = "✅ Sign up यशस्वी!";
+          window.location.href = "preference.html";
+        })
+        .catch(err => {
+          document.getElementById('message').innerText = "❌ " + err.message;
+        });
+    }
+
+    function googleLogin() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(result => {
+          document.getElementById('message').innerText = "✅ Google लॉगिन यशस्वी!";
+          window.location.href = "preference.html";
+        })
+        .catch(err => {
+          document.getElementById('message').innerText = "❌ " + err.message;
+        });
+    }
+  </script>
+</body>
+</html>

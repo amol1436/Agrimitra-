@@ -2,55 +2,222 @@
 <html lang="mr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AgriMitra - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #1c1b2d, #282846);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background-color: #1e1e2f;
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo img {
+      width: 80px;
+    }
+
+    .logo h2 {
+      color: #4CAF50;
+      margin-top: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      color: #bbb;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab.active {
+      color: white;
+      border-bottom: 2px solid white;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin: 10px 0;
+      background: #2e2e42;
+      color: white;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      color: white;
+      font-weight: bold;
+      margin: 15px 0;
+      cursor: pointer;
+    }
+
+    .google-btn {
+      background: #1e1e2f;
+      border: 1px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .google-btn img {
+      width: 20px;
+    }
+
+    #msg {
+      color: #ff4b2b;
+      text-align: center;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+
+  <!-- Firebase JS SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 </head>
-<body style="font-family:'Segoe UI'; background:#1e1e2f; color:white; text-align:center; padding: 50px;">
-  <h1>AgriMitra</h1>
-  <input type="email" id="email" placeholder="ईमेल" style="padding:10px; width:200px;" /><br/>
-  <input type="password" id="password" placeholder="पासवर्ड" style="padding:10px; width:200px;" /><br/>
-  <button onclick="signUp()" style="margin:5px; padding:10px 20px;">Sign Up</button>
-  <button onclick="login()" style="margin:5px; padding:10px 20px;">Login</button>
-  <p id="message"></p>
+<body>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  <div class="container">
+    <div class="logo">
+  <img src="https://raw.githubusercontent.com/amol1436/Agrimitra-/refs/heads/main/file_00000000c07461f6b7089f1196f12216%20(1).png" alt="AgriMitra Logo" style="width: 120px; height: auto;" />
+</div>
 
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <div id="form">
+      <input type="email" id="email" placeholder="Enter email" />
+      <input type="password" id="password" placeholder="Enter password" />
+      <button class="btn" onclick="login()">Login</button>
+    </div>
+
+    <button class="btn google-btn" onclick="googleSignIn()">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="G"/>
+      Continue with Google
+    </button>
+
+    <p id="msg"></p>
+  </div>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDY6fRrW3I-3JntOWM9zWGTBDPj5oZqFz0",
       authDomain: "agrimitra-36850.firebaseapp.com",
       projectId: "agrimitra-36850",
-      appId: "1:838172276534:web:69054f06dd8c5010c0a597"
+      storageBucket: "agrimitra-36850.appspot.com",
+      messagingSenderId: "838172276534",
+      appId: "1:838172276534:web:69054f06dd8c5010c0a597",
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-    window.signUp = () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
+    let isLogin = true;
+
+    function switchTab(tab) {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(t => t.classList.remove('active'));
+
+      if (tab === 'login') {
+        tabs[0].classList.add('active');
+        document.getElementById('form').innerHTML = `
+          <input type="email" id="email" placeholder="Enter email" />
+          <input type="password" id="password" placeholder="Enter password" />
+          <button class="btn" onclick="login()">Login</button>
+        `;
+        isLogin = true;
+      } else {
+        tabs[1].classList.add('active');
+        document.getElementById('form').innerHTML = `
+          <input type="text" id="fname" placeholder="Enter first name" />
+          <input type="text" id="lname" placeholder="Enter last name" />
+          <input type="password" id="password" placeholder="Enter password" />
+          <button class="btn" onclick="signup()">Sign Up</button>
+        `;
+        isLogin = false;
+      }
+    }
+
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      auth.signInWithEmailAndPassword(email, password)
         .then(() => {
-          document.getElementById("message").innerText = "✅ Sign up यशस्वी!";
-          window.location.href = "preference.html";
+          document.getElementById('msg').innerText = "✅ Login successful!";
         })
-        .catch(error => {
-          document.getElementById("message").innerText = `❌ ${error.message}`;
+        .catch(err => {
+          document.getElementById('msg').innerText = "❌ " + err.message;
         });
-    };
+    }
 
-    window.login = () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password)
+    function signup() {
+      const fname = document.getElementById('fname').value;
+      const lname = document.getElementById('lname').value;
+      const email = `${fname}.${lname}@agrimitra.com`.toLowerCase(); // Email generate
+      const password = document.getElementById('password').value;
+
+      auth.createUserWithEmailAndPassword(email, password)
         .then(() => {
-          document.getElementById("message").innerText = "✅ Login यशस्वी!";
-          window.location.href = "preference.html";
+          document.getElementById('msg').innerText = "✅ खाते तयार झाले!";
         })
-        .catch(error => {
-          document.getElementById("message").innerText = `❌ ${error.message}`;
+        .catch(err => {
+          document.getElementById('msg').innerText = "❌ " + err.message;
         });
-    };
+    }
+
+    function googleSignIn() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(() => {
+          document.getElementById('msg').innerText = "✅ Google login successful!";
+        })
+        .catch(err => {
+          document.getElementById('msg').innerText = "❌ " + err.message;
+        });
+    }
   </script>
+
 </body>
 </html>
